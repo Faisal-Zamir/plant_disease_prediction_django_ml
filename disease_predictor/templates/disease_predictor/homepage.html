@@ -93,7 +93,7 @@
             border: 1px solid #ced4da;
             border-radius: 5px;
             margin: 0 auto;
-            display: none;
+            display: ;
         }
         
         .prediction-result {
@@ -235,86 +235,98 @@
         </div>
         
         <div class="row g-0">
-            <!-- Upload Section -->
-            <div class="col-md-6 upload-section">
-                <h3 class="mb-4">Upload Leaf Image</h3>
-                
-                <div class="supported-plants">
-                    <div class="plant-badge">
-                        <i class="fas fa-apple-alt"></i>
-                        <span>Tomato</span>
-                    </div>
-                    <div class="plant-badge">
-                        <i class="fas fa-seedling"></i>
-                        <span>Potato</span>
-                    </div>
-                    <div class="plant-badge">
-                        <i class="fas fa-pepper-hot"></i>
-                        <span>Pepper</span>
-                    </div>
-                </div>
-                
-                <div class="upload-area" id="uploadArea">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <h5>Drag & Drop or Click to Upload</h5>
-                    <p class="text-muted">Supported formats: JPG, PNG, JPEG</p>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                </div>
-                
-                <div class="preview-container">
-                    <img id="imagePreview" class="leaf-preview" alt="Leaf Preview">
-                </div>
-                
-                <div class="instructions">
-                    <h6><i class="fas fa-info-circle me-2"></i>Image Requirements:</h6>
-                    <ul class="mb-0 ps-3">
-                        <li>Clear image of plant leaf (tomato, potato, or pepper)</li>
-                        <li>Good lighting for accurate detection</li>
-                        <li>Focus on the leaf area</li>
-                        <li>Avoid blurry or dark images</li>
-                    </ul>
-                </div>
-                
-                <div class="d-grid mt-4">
-                    <button class="btn btn-primary btn-lg" id="detectBtn">
-                        <i class="fas fa-search me-2"></i>Detect Disease
-                    </button>
-                </div>
-            </div>
+           <!-- Upload Section Form -->
+<div class="col-md-6 upload-section">
+    <h3 class="mb-4">Upload Leaf Image</h3>
+
+    <div class="supported-plants">
+        <div class="plant-badge">
+            <i class="fas fa-apple-alt"></i>
+            <span>Tomato</span>
+        </div>
+        <div class="plant-badge">
+            <i class="fas fa-seedling"></i>
+            <span>Potato</span>
+        </div>
+        <div class="plant-badge">
+            <i class="fas fa-pepper-hot"></i>
+            <span>Pepper</span>
+        </div>
+    </div>
+
+    <!-- Form starts here -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click();">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h5>Drag & Drop or Click to Upload</h5>
+            <p class="text-muted">Supported formats: JPG, PNG, JPEG</p>
+            <input type="file" id="fileInput" name="leaf_image" accept="image/*" style="display: none;" required>
+        </div>
+
+        <div class="preview-container">
+            <img src="{{uploaded_url}}" id="imagePreview" class="leaf-preview" alt="Leaf Preview">
+        </div>
+
+        <div class="instructions">
+            <h6><i class="fas fa-info-circle me-2"></i>Image Requirements:</h6>
+            <ul class="mb-0 ps-3">
+                <li>Clear image of plant leaf (tomato, potato, or pepper)</li>
+                <li>Good lighting for accurate detection</li>
+                <li>Focus on the leaf area</li>
+                <li>Avoid blurry or dark images</li>
+            </ul>
+        </div>
+
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-primary btn-lg" id="">
+                <i class="fas fa-search me-2"></i>Detect Disease
+            </button>
+        </div>
+    </form>
+    <!-- Form ends here -->
+
+</div>
             
-            <!-- Result Section -->
+            <!-- Result Section --> 
             <div class="col-md-6 result-section">
                 <h3 class="mb-4">Detection Result</h3>
                 
                 <div class="text-center">
                     <p id="resultMessage" class="lead">Upload a leaf image to see the detection result</p>
                     
-                    <div id="resultContainer" style="display: none;">
+                    <div id="resultContainer" style="display:;">
                         <div class="result-display" id="predictionResult">
                             <!-- Result will be shown here -->
                         </div>
                         
                         <div class="plant-info">
-                            <p><i class="fas fa-leaf plant-icon"></i>Plant: <strong id="plantType">Tomato</strong></p>
-                            <p><i class="fas fa-vial plant-icon"></i>Condition: <strong id="diseaseName">Healthy</strong></p>
+                            <p><i class="fas fa-vial plant-icon"></i>Condition: <strong id="diseaseName">{{prediction_result}}</strong></p>
                         </div>
                         
                         <div class="confidence-bar mt-4">
                             <div class="confidence-fill" id="confidenceFill"></div>
                         </div>
-                        <p>Confidence: <span id="confidenceValue">0%</span></p>
-                        
+                        {% if confidence %}
+                        <p>Confidence: <span id="confidenceValue">{{confidence}}%</span></p>
+                    
+                        {% else %}
+                   <p>Confidence: <span id="confidenceValue"> None</span></p>
+
+                        {% endif %}
+
                         <div class="mt-4">
                             <h5>Recommendations</h5>
                             <p id="recommendations" class="text-start">Keep maintaining good plant care practices.</p>
                         </div>
                     </div>
                     
-                    <div id="uploadedImageContainer" class="mt-4" style="display: none;">
+                    <div id="uploadedImageContainer" class="mt-4" style="display:;">
                         <h5>Uploaded Image</h5>
-                        <img id="uploadedImage" class="leaf-preview" alt="Uploaded Leaf">
+                        <img src="{{uploaded_url}}" id="uploadedImage" class="leaf-preview" alt="Uploaded Leaf">
                     </div>
-                </div>
+              </div>
             </div>
         </div>
     </div>
@@ -336,134 +348,84 @@
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('fileInput');
-            const uploadArea = document.getElementById('uploadArea');
-            const imagePreview = document.getElementById('imagePreview');
-            const detectBtn = document.getElementById('detectBtn');
-            const resultMessage = document.getElementById('resultMessage');
-            const resultContainer = document.getElementById('resultContainer');
-            const predictionResult = document.getElementById('predictionResult');
-            const plantType = document.getElementById('plantType');
-            const diseaseName = document.getElementById('diseaseName');
-            const confidenceFill = document.getElementById('confidenceFill');
-            const confidenceValue = document.getElementById('confidenceValue');
-            const uploadedImageContainer = document.getElementById('uploadedImageContainer');
-            const uploadedImage = document.getElementById('uploadedImage');
-            const recommendations = document.getElementById('recommendations');
-            
-            let selectedFile = null;
-            
-            // Upload area click event
-            uploadArea.addEventListener('click', function() {
-                fileInput.click();
-            });
-            
-            // Drag and drop functionality
-            uploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                uploadArea.style.borderColor = 'var(--primary-color)';
-                uploadArea.style.backgroundColor = 'rgba(46, 125, 50, 0.1)';
-            });
-            
-            uploadArea.addEventListener('dragleave', function() {
-                uploadArea.style.borderColor = '#ced4da';
-                uploadArea.style.backgroundColor = '';
-            });
-            
-            uploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                uploadArea.style.borderColor = '#ced4da';
-                uploadArea.style.backgroundColor = '';
-                
-                if (e.dataTransfer.files.length) {
-                    handleFile(e.dataTransfer.files[0]);
-                }
-            });
-            
-            // File input change event
-            fileInput.addEventListener('change', function() {
-                if (this.files.length) {
-                    handleFile(this.files[0]);
-                }
-            });
-            
-            // Handle selected file
-            function handleFile(file) {
-                if (!file.type.match('image.*')) {
-                    alert('Please select an image file (JPG, PNG, JPEG)');
-                    return;
-                }
-                
-                selectedFile = file;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    // Show preview in upload area
-                    imagePreview.src = e.target.result;
-                    imagePreview.style.display = 'block';
-                    
-                    // Show preview in sidebar (result section)
-                    uploadedImage.src = e.target.result;
-                    uploadedImageContainer.style.display = 'block';
-                    
-                    // Update result message
-                    resultMessage.textContent = 'Image uploaded! Click "Detect Disease" to analyze.';
-                    
-                    // Hide previous results
-                    resultContainer.style.display = 'none';
-                };
-                reader.readAsDataURL(file);
-            }
-            
-            // Detect button click event
-            detectBtn.addEventListener('click', function() {
-                if (!selectedFile) {
-                    alert('Please select an image first');
-                    return;
-                }
-                
-                // Simulate API call with loading state
-                detectBtn.disabled = true;
-                detectBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
-                
-                // In a real implementation, this would be an API call to your Django backend
-                setTimeout(function() {
-                    // Simulate a response with random results
-                    const plants = ['Tomato', 'Potato', 'Pepper'];
-                    const conditions = ['Healthy', 'Early Blight', 'Late Blight', 'Bacterial Spot', 'Mosaic Virus'];
-                    const randomPlant = plants[Math.floor(Math.random() * plants.length)];
-                    const randomCondition = conditions[Math.floor(Math.random() * conditions.length)];
-                    const isHealthy = randomCondition === 'Healthy';
-                    const randomConfidence = Math.floor(Math.random() * 30) + 70; // 70-100%
-                    
-                    // Update UI with results
-                    predictionResult.textContent = isHealthy ? 'HEALTHY' : 'DISEASE DETECTED';
-                    predictionResult.className = `result-display ${isHealthy ? 'healthy' : 'disease'}`;
-                    
-                    plantType.textContent = randomPlant;
-                    diseaseName.textContent = randomCondition;
-                    confidenceFill.style.width = randomConfidence + '%';
-                    confidenceValue.textContent = randomConfidence + '%';
-                    
-                    // Set recommendations based on condition
-                    if (isHealthy) {
-                        recommendations.textContent = 'Your plant appears healthy! Continue with regular watering, proper sunlight, and balanced fertilization.';
-                    } else {
-                        recommendations.textContent = `Recommended treatment for ${randomCondition}: Remove affected leaves, apply appropriate fungicide, ensure proper air circulation, and avoid overhead watering.`;
-                    }
-                    
-                    resultMessage.textContent = 'Analysis complete!';
-                    resultContainer.style.display = 'block';
-                    
-                    // Reset button
-                    detectBtn.disabled = false;
-                    detectBtn.innerHTML = '<i class="fas fa-search me-2"></i>Detect Disease';
-                }, 2000);
-            });
-        });
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const imagePreview = document.getElementById('imagePreview');
+
+    // Click on upload area opens file dialog
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = 'var(--primary-color)';
+        uploadArea.style.backgroundColor = 'rgba(46, 125, 50, 0.1)';
+    });
+
+    uploadArea.addEventListener('dragleave', function() {
+        uploadArea.style.borderColor = '#ced4da';
+        uploadArea.style.backgroundColor = '';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ced4da';
+        uploadArea.style.backgroundColor = '';
+
+        if (e.dataTransfer.files.length) {
+            const file = e.dataTransfer.files[0];
+
+            // Show preview
+            handleFile(file);
+
+            // Assign file to the hidden file input so form submit works
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        }
+    });
+
+    // File input change event
+    fileInput.addEventListener('change', function() {
+        if (this.files.length) {
+            handleFile(this.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (!file.type.match('image.*')) {
+            alert('Please select an image file (JPG, PNG, JPEG)');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Show preview
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
     </script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    let confidenceValueElement = document.getElementById("confidenceValue");
+    let confidenceFill = document.getElementById("confidenceFill");
+
+    if (confidenceValueElement && confidenceFill) {
+        // Extract number from "85%" → 85
+        let confidencePercent = parseFloat(confidenceValueElement.textContent.replace("%", "")) || 0;
+
+        // Update the bar width
+        confidenceFill.style.width = confidencePercent + "%";
+    }
+});
+</script>
+
 </body>
 </html>
