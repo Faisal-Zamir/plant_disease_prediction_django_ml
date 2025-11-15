@@ -10,7 +10,7 @@ from django.core.files.storage import FileSystemStorage
 def homepage(request):
     prediction_result = None
     confidence = None
-
+    uploaded_url = None
     if request.method == "POST" and request.FILES.get("leaf_image"):
         leaf_image = request.FILES["leaf_image"]
 
